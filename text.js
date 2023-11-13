@@ -15,7 +15,7 @@ const gameCollection = [
 
             card.innerHTML = `
                 <h3>${this.name}</h3>
-                <p>I'm thinking of a number between 1 and 26. Can you guess it?</p>
+                <p>I'm thinking of a number between 1 and 10. Can you guess it?</p>
                 <input type="number" id="guess" min="1" max="26">
                 <button id="checkButton">Check</button>
                 <p id="message"></p>
@@ -34,7 +34,7 @@ const gameCollection = [
                     if (userGuess === randomNumber) {
                         message.textContent = `Awesome! Your number ${guessInput.value} was correct. You can be named many things, hungry not being one of them.`;
                     } else if (userGuess === randomNumber + 1 || userGuess === randomNumber - 1) {
-                        message.textContent = "So close! Better luck next time!";
+                        message.textContent = "So close! Try again!";
                     } else {
                         message.textContent = `Bummer... You guessed ${guessInput.value} and the secret number was ${randomNumber}`;
                     }
@@ -47,7 +47,6 @@ const gameCollection = [
             function createPlayAgainButton() {
                 const playAgainButton = document.createElement('button');
                 playAgainButton.textContent = "Play Again";
-                playAgainButton.classList.add('play-again-button');
                 playAgainButton.onclick = () => {
                     randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
                     guessInput.value = '';
@@ -73,6 +72,7 @@ const gameCollection = [
                     <p id="message"></p>
                 `;
 
+            // Make a move and determine the winner
             function makeMove(userChoice) {
                 if (gameStarted) return;
                 gameStarted = true;
@@ -90,6 +90,7 @@ const gameCollection = [
                     "Lizard": ["Spock", "Paper"],
                     "Spock": ["Rock", "Scissors"],
                 };
+
                 // Determine the winner based on the rules
                 let resultMessage;
                 if (userChoice === computerChoice) {
@@ -106,10 +107,10 @@ const gameCollection = [
                 // Display the "Play Again" button
                 playAgainButton.style.display = 'block';
             }
+
             // Display game message
             const message = document.createElement('p');
             message.textContent = 'Choose Your Weapon'
-
             // Original "Play" button
             const playButton = document.createElement('button');
             playButton.textContent = 'Play';
@@ -123,11 +124,11 @@ const gameCollection = [
                 });
                 message.textContent = 'Choose Your Weapon'
             };
+
             // "Play Again" button
             const playAgainButton = document.createElement('button');
             playAgainButton.textContent = 'Play Again';
             playAgainButton.style.display = 'none'; 
-            playAgainButton.classList.add('play-again-button');
             playAgainButton.onclick = () => {
                 gameStarted = false;
                 playButton.style.display = 'block'; 
@@ -135,6 +136,7 @@ const gameCollection = [
                 message.textContent = "That's my Spot. You're in my Spot";
                 choiceButtons.innerHTML = ''; 
             };
+
             // Create a container for choice buttons
             const choiceButtons = document.createElement('div');
             choiceButtons.className = 'choice-buttons';
@@ -144,8 +146,9 @@ const gameCollection = [
             card.appendChild(message);
             card.appendChild(playButton);
             card.appendChild(playAgainButton);
-        },
+    }
     },
+    
     {
         name: '21 Card Game',
         code: function (card) {
@@ -162,39 +165,29 @@ const gameCollection = [
                 deck.push({ suit, value });
             }
         }
-        // Shuffle deck
+
+        // Shuffle the deck
         function shuffleDeck(deck) {
             for (let i = deck.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [deck[i], deck[j]] = [deck[j], deck[i]];
             }
         }
+
         // Deal initial cards to the player and dealer
         function dealInitialCards() {
             playerHand.push(...deck.splice(0, 2));
             dealerHand.push(...deck.splice(0, 2));
         }
+
         // Calculate the score of a hand
         function calculateScore(hand) {
-            let score = hand.reduce((score, card) => {
+            return hand.reduce((score, card) => {
                 const value = card.value;
-                if (value === 'A') {
-                    return score + 11; 
-                } else if (value.charCodeAt(0) >= 50 && value.charCodeAt(0) <= 57) {
-                    return score + parseInt(value);
-                } else {
-                    return score + 10;
-                }
+                return value === 'A' ? score + 11 : value.charCodeAt(0) >= 50 && value.charCodeAt(0) <= 57 ? score + parseInt(value) : score + 10;
             }, 0);
-            // Handle Aces as 1 if needed
-            hand.filter(card => card.value === 'A').forEach(ace => {
-                if (score > 21) {
-                    score -= 10; 
-                }
-            });
-
-            return score;
         }
+
         // Check for a win condition
         function checkWinConditions() {
             const playerScore = calculateScore(playerHand);
@@ -211,6 +204,7 @@ const gameCollection = [
             }
             isGameOver = true;
         }
+
         // Display the game result message
         function resultMessage(message) {
             const messageElement = document.createElement('p');
@@ -220,7 +214,6 @@ const gameCollection = [
             // Add a button to play again
             const playAgainButton = document.createElement('button');
             playAgainButton.textContent = 'Play Again';
-            playAgainButton.classList.add('play-again-button');
             playAgainButton.onclick = () => {
                 playerHand.length = 0;
                 dealerHand.length = 0;
@@ -239,11 +232,11 @@ const gameCollection = [
 
             // Display player/dealer hand and score
             const playerHandElement = document.createElement('p');
-            playerHandElement.textContent = `Player's Hand: ${playerHand.map(card => `${card.value} of ${card.suit}`).join(', ')}`;
+            playerHandElement.textContent = `Player's Hand: ${playerHand.map(card => card.value).join(', ')}`;
             card.appendChild(playerHandElement);
 
             const dealerHandElement = document.createElement('p');
-            dealerHandElement.textContent =  `Dealer's Hand: ${dealerHand.map(card => `${card.value} of ${card.suit}`).join(', ')}`;
+            dealerHandElement.textContent = `Dealer's Hand: ${dealerHand.map(card => card.value).join(', ')}`;
             card.appendChild(dealerHandElement);
 
             const playerScoreElement = document.createElement('p');
@@ -255,40 +248,42 @@ const gameCollection = [
             hitButton.textContent = 'Hit';
             hitButton.onclick = () => {
                 if (!isGameOver) {
-                    const drawnCard = deck.pop();
-                    playerHand.push(drawnCard);
-                    playerScoreElement.textContent = `Player's Score: ${calculateScore(playerHand)}`;
-                    playerHandElement.textContent += `, ${drawnCard.value} of ${drawnCard.suit}`;
-        
-                    if (calculateScore(playerHand) >= 21) {
+                    playerHand.push(deck.pop());
+                    const playerScore = calculateScore(playerHand);
+                    playerScoreElement.textContent = `Player's Score: ${playerScore}`;
+
+                    if (playerScore >= 21) {
                         checkWinConditions();
                     }
                 }
             };
             card.appendChild(hitButton);
-        
+
             const standButton = document.createElement('button');
             standButton.textContent = 'Stand';
             standButton.onclick = () => {
                 if (!isGameOver) {
                     // Dealer's turn
                     while (calculateScore(dealerHand) < 17) {
-                        const drawnCard = deck.pop();
-                        dealerHand.push(drawnCard);
-                        dealerHandElement.textContent += `, ${drawnCard.value} of ${drawnCard.suit}`;
+                        dealerHand.push(deck.pop());
                     }
+                    dealerHandElement.textContent = `Dealer's Hand: ${dealerHand.map(card => card.value).join(', ')}`;
                     checkWinConditions();
                 }
             };
             card.appendChild(standButton);
 
+            // Check for win conditions after initial deal
             if (playerScore === 21) {
                 checkWinConditions();
             }
         }
+
         // Start the game
         startGame();
     },
+
+    
     },
     {
         name: 'Memory Game',
